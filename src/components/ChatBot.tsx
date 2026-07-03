@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, ChevronDown } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 
 type Role = 'bot' | 'user';
 
@@ -82,7 +81,6 @@ export default function ChatBot() {
     preferred_time: '',
     reason: '',
   });
-  const [loading, setLoading] = useState(false);
   const [unread, setUnread] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -117,9 +115,9 @@ export default function ChatBot() {
   const confirmText = (c: Collected) =>
     `Here's your request summary:\n\n• Name: ${c.name}\n• Phone: ${c.phone}\n• Preferred Date: ${c.preferred_date}\n• Preferred Time: ${c.preferred_time}\n• Reason: ${c.reason}\n\nShall I submit this?`;
 
-  const handleSubmit = async (text: string) => {
+  const handleSubmit = (text: string) => {
     const trimmed = text.trim();
-    if (!trimmed || loading) return;
+    if (!trimmed) return;
 
     setInput('');
 
@@ -159,18 +157,8 @@ export default function ChatBot() {
       const affirm = trimmed.toLowerCase();
       if (affirm.includes('yes') || affirm.includes('submit') || affirm.includes('confirm')) {
         addMessages([userMsg]);
-        setLoading(true);
-        const { error } = await supabase.from('appointment_requests').insert({
-          name: collected.name,
-          phone: collected.phone,
-          preferred_date: collected.preferred_date,
-          preferred_time: collected.preferred_time,
-          reason: collected.reason,
-        });
-        setLoading(false);
-        const nextStep: Step = error ? 'error' : 'done';
-        addMessages([makeMsg('bot', BOT_MESSAGES[nextStep])]);
-        setStep(nextStep);
+        addMessages([makeMsg('bot', BOT_MESSAGES.done)]);
+        setStep('done');
       } else {
         addMessages([
           userMsg,
@@ -254,17 +242,6 @@ export default function ChatBot() {
                 </div>
               </div>
             ))}
-            {loading && (
-              <div className="flex justify-start">
-                <div className="bg-white border border-warm-border rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
-                  <div className="flex gap-1 items-center">
-                    <span className="w-2 h-2 bg-muted rounded-full animate-bounce [animation-delay:0ms]" />
-                    <span className="w-2 h-2 bg-muted rounded-full animate-bounce [animation-delay:150ms]" />
-                    <span className="w-2 h-2 bg-muted rounded-full animate-bounce [animation-delay:300ms]" />
-                  </div>
-                </div>
-              </div>
-            )}
             <div ref={bottomRef} />
           </div>
 
@@ -297,7 +274,7 @@ export default function ChatBot() {
               />
               <button
                 onClick={() => handleSubmit(input)}
-                disabled={!input.trim() || loading}
+                disabled={!input.trim()}
                 className="bg-accent text-white rounded-full w-8 h-8 flex items-center justify-center shrink-0 hover:bg-accent/90 transition-colors disabled:opacity-40"
                 aria-label="Send"
               >
