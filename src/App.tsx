@@ -12,8 +12,10 @@ import EmergencyDental from './pages/EmergencyDental';
 import Insurance from './pages/Insurance';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
+import { usePageTracking } from './hooks/usePageTracking';
 
 function App() {
+  usePageTracking();
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <TopBar />
