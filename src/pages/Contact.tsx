@@ -3,16 +3,17 @@ import { Phone, MapPin, Printer, Clock, Calendar, AlertTriangle } from 'lucide-r
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', 'preferred-date': '', message: '' });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = e.currentTarget;
-    await fetch('/', {
+    fetch('/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(new FormData(form) as unknown as Record<string, string>).toString(),
-    });
-    setSubmitted(true);
+      body: new URLSearchParams({ 'form-name': 'contact', ...formData }).toString(),
+    })
+      .then(() => setSubmitted(true))
+      .catch((error) => alert(error));
   };
 
   return (
@@ -126,7 +127,7 @@ export default function Contact() {
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
               </div>
               <h3 className="text-xl font-bold text-primary-dark mb-2">Thank you!</h3>
-              <p className="text-muted">We'll confirm your appointment by phone within 1 business day.</p>
+              <p className="text-muted">We'll be in touch within 1 business day.</p>
             </div>
           ) : (
             <form
@@ -139,25 +140,25 @@ export default function Contact() {
               <input type="hidden" name="form-name" value="contact" />
               <div>
                 <label className="block text-sm font-medium text-primary-dark mb-1">Full Name</label>
-                <input required type="text" name="name" className="w-full border border-warm-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50" />
+                <input required type="text" name="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full border border-warm-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-sm font-medium text-primary-dark mb-1">Phone Number</label>
-                  <input required type="tel" name="phone" className="w-full border border-warm-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50" />
+                  <input required type="tel" name="phone" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full border border-warm-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-primary-dark mb-1">Email</label>
-                  <input required type="email" name="email" className="w-full border border-warm-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50" />
+                  <input required type="email" name="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full border border-warm-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-primary-dark mb-1">Preferred Date</label>
-                <input type="date" name="preferred-date" className="w-full border border-warm-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50" />
+                <input type="date" name="preferred-date" value={formData['preferred-date']} onChange={(e) => setFormData({ ...formData, 'preferred-date': e.target.value })} className="w-full border border-warm-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-primary-dark mb-1">Message</label>
-                <textarea rows={4} name="message" className="w-full border border-warm-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50" />
+                <textarea rows={4} name="message" value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="w-full border border-warm-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/50" />
               </div>
               <button type="submit" className="w-full bg-accent text-white font-bold px-6 py-3 rounded-lg hover:bg-accent/90 transition-colors">
                 Send Request
