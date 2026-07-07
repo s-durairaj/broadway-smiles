@@ -1,5 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Phone, ChevronDown, ChevronUp } from 'lucide-react';
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"Does Broadway Smiles accept Texas Medicaid?","acceptedAnswer":{"@type":"Answer","text":"Yes. We accept Texas Medicaid for children and qualifying adults, plus CHIP and Adult Medicare."}},
+    {"@type":"Question","name":"Do you offer emergency dental care?","acceptedAnswer":{"@type":"Answer","text":"Yes — same-day emergency appointments. Call 903-951-1244."}},
+    {"@type":"Question","name":"When should my child first see a dentist?","acceptedAnswer":{"@type":"Answer","text":"The AAPD recommends a first visit at 6 months or when the first tooth appears."}},
+    {"@type":"Question","name":"Do you offer dental implants?","acceptedAnswer":{"@type":"Answer","text":"Yes. Dr. Shetty handles the crown; a trusted oral surgeon handles implant placement."}},
+    {"@type":"Question","name":"Do you offer financing?","acceptedAnswer":{"@type":"Answer","text":"Yes — CareCredit with 0% interest from 6 to 48 months."}}
+  ]
+};
 
 interface FAQItem {
   q: string;
@@ -65,6 +77,14 @@ const sections: FAQSection[] = [
 
 export default function FAQ() {
   const [openKey, setOpenKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify(faqSchema);
+    document.head.appendChild(script);
+    return () => { document.head.removeChild(script); };
+  }, []);
 
   const toggle = (key: string) => {
     setOpenKey(openKey === key ? null : key);
